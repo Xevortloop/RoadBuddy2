@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function HomePageScreen() {
+export default function HomePageScreen2() {
   const navigation = useNavigation();
   const [userName, setUserName] = useState('');  // Menyimpan nama pengguna
   const [balance, setBalance] = useState(0); // Default saldo
@@ -18,7 +18,7 @@ export default function HomePageScreen() {
         return;
       }
   
-      const response = await fetch('http://192.168.18.20:3000/user/balance', {
+      const response = await fetch('http://192.168.18.20:3000/mechanic/balance', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`, // Kirim token dalam header
@@ -88,15 +88,17 @@ export default function HomePageScreen() {
         <View style={styles.menuCategoryContainer}>
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate('LocationPicker')}  >
+          onPress={() => navigation.navigate('TakeOrder')}  >
             <Image source={require('../../assets/lokasi.png')} style={styles.icon} />
-            <Text style={styles.menuText}>Order</Text>
+            <Text style={styles.menuText}>Take Order</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}
-                      onPress={() => {
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => {
               console.log("Navigating to TransaksiMechanic...");
-              navigation.navigate('TransactionUser');
-            }}>
+              navigation.navigate('TransaksiMechanic');
+            }}
+          >
             <Image source={require('../../assets/transaksi.png')} style={styles.icon} />
             <Text style={styles.menuText}>Transaksi</Text>
           </TouchableOpacity>

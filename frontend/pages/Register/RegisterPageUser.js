@@ -19,10 +19,16 @@ export default function RegisterPageUser() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Track if the registration is in progress
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
 
   const handleRegister = () => {
+    if (!fullName || !username || !email || !phone || !password) {
+      setErrorMessage('Please fill all fields.');
+      return;
+    }
+
     const userData = {
       full_name: fullName,
       username,
@@ -31,27 +37,26 @@ export default function RegisterPageUser() {
       password_user: password,
       role_user: 'user',
     };
-  
-    setIsSubmitting(true); // Start the registration process
-  
-    // Kirim data ke server menggunakan axios
-    axios.post('http://192.168.18.20:3000/register', userData)
+
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    axios.post('http://192.168.18.20:3000/user/register', userData)
       .then((response) => {
-        const verificationCode = response.data.verificationCode; // Ambil kode dari server
+        const { verificationCode, userId } = response.data;
         alert('User registered successfully! Please verify your email.');
-        
-        // Navigasi ke halaman verifikasi dan kirimkan email serta kode verifikasi
         navigation.navigate('EmailVerification', {
-          email: email,
-          verificationCode: verificationCode,
+          email,
+          verificationCode,
+          userId
         });
       })
       .catch((error) => {
         console.error(error.response ? error.response.data : error);
-        alert('Failed to register user');
+        setErrorMessage('Failed to register user. Please try again.');
       })
       .finally(() => {
-        setIsSubmitting(false); // Selesai pendaftaran
+        setIsSubmitting(false);
       });
   };
 
@@ -68,10 +73,12 @@ export default function RegisterPageUser() {
           <Text style={styles.title}>Register as User</Text>
           <Text style={styles.subtitle}>Please fill in the details</Text>
 
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
           <View style={styles.formContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Nama Lengkap"
+              placeholder="Full Name"
               value={fullName}
               onChangeText={(text) => setFullName(text)}
             />
@@ -91,7 +98,7 @@ export default function RegisterPageUser() {
             />
             <TextInput
               style={styles.input}
-              placeholder="No Telepon"
+              placeholder="Phone Number"
               value={phone}
               onChangeText={(text) => setPhone(text)}
               keyboardType="phone-pad"
@@ -117,16 +124,16 @@ export default function RegisterPageUser() {
             <TouchableOpacity 
               style={styles.registerButton} 
               onPress={handleRegister} 
-              disabled={isSubmitting} // Disable button while submitting
+              disabled={isSubmitting}
             >
               <Text style={styles.registerButtonText}>
-                {isSubmitting ? 'Processing...' : 'Daftar'}
+                {isSubmitting ? 'Processing...' : 'Register'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
               <Text style={styles.loginRedirectText}>
-                Sudah punya akun? <Text style={styles.loginLink}>Login</Text>
+                Already have an account? <Text style={styles.loginLink}>Login</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -224,5 +231,10 @@ const styles = StyleSheet.create({
   loginLink: {
     color: '#007BFF',
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 15,
+    fontSize: 16,
   },
 });

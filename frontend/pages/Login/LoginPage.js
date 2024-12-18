@@ -22,9 +22,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigation = useNavigation();
-
-
-
   const handleLogin = async () => {
     if (!email || !password) {
       alert('Email dan password wajib diisi!');
@@ -36,23 +33,34 @@ export default function LoginPage() {
     try {
       const response = await axios.post('http://192.168.18.20:3000/login', userData);
   
-      console.log('Server Response:', response.data); // Tambahkan log ini untuk melihat data yang dikembalikan server
-      const { token, name , phone, email, fullname} = response.data;
+      console.log('Server Response:', response.data);
+      const { token, name, phone, email, fullname, idUser, role } = response.data;
   
       if (!token || !name) {
         throw new Error('Data tidak valid dari server.');
       }
+  
+      // Store data in AsyncStorage
+      await AsyncStorage.setItem('idUser', JSON.stringify(idUser));
       await AsyncStorage.setItem('fname', fullname);
       await AsyncStorage.setItem('email', email);
       await AsyncStorage.setItem('phone', phone);
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('name', name);
+      await AsyncStorage.setItem('role', role);
   
       alert('Login berhasil!');
-      navigation.navigate('Home');
+      
+      // Navigate based on user role
+      if (role === 'user') {
+        navigation.navigate('Home');
+      } else if (role === 'mechanic') {
+        navigation.navigate('Home2');
+      }
     } catch (error) {
       if (error.response) {
         console.error('Error:', error.response.data);
+        // Provide more detailed feedback from the server
         alert(error.response.data.error || 'Login gagal! Periksa kembali email dan password Anda.');
       } else {
         console.error('Error:', error);
@@ -66,12 +74,11 @@ export default function LoginPage() {
   const handleChoice = (choice) => {
     setIsModalVisible(false);
     if (choice === 'User') {
-      navigation.navigate('RegisterUser'); // Corrected: use 'RegisterUser' instead of 'Register'
+      navigation.navigate('RegisterUser');
     } else if (choice === 'Mechanic') {
-      navigation.navigate('RegisterMechanic'); // Corrected: use 'RegisterMechanic' instead of 'Register'
+      navigation.navigate('RegisterMechanic');
     }
   };
-  
 
   const navigateToForgotPassword = () => {
     alert('Fitur lupa password sedang dalam pengembangan.');
@@ -177,7 +184,6 @@ export default function LoginPage() {
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

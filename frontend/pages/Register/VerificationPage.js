@@ -1,14 +1,45 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Alert } from 'react-native';
+import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
 export default function EmailVerificationPage({ route }) {
-  const { email, verificationCode } = route.params; // Data dari halaman sebelumnya
+  const { email, userId } = route.params;
+  const [enteredCode, setEnteredCode] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigation = useNavigation();
 
-  const handleContinue = () => {
-    // Navigasi ke halaman berikutnya setelah verifikasi
-    navigation.navigate('Login'); // Ubah sesuai kebutuhan Anda
+  const handleVerify = () => {
+    if (!enteredCode) {
+      Alert.alert('Error', 'Kode verifikasi tidak boleh kosong.');
+      return;
+    }
+  
+    setIsSubmitting(true);
+    
+    // Debug log sebelum mengirim request
+    console.log('Entered Code:', enteredCode);
+    
+    axios.post('http://192.168.18.20:3000/verify-email', {
+      userId,
+      verificationCode: enteredCode,  // Kirim enteredCode yang dimasukkan pengguna
+    })
+    .then((response) => {
+      if (response.data.success) {
+        Alert.alert('Success', 'Email berhasil diverifikasi!');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Error', 'Kode verifikasi tidak valid. Silakan coba lagi.');
+        setEnteredCode('');
+      }
+    })
+    .catch((error) => {
+      console.error(error.response ? error.response.data : error);
+      Alert.alert('Error', 'Terjadi kesalahan. Silakan coba lagi nanti.');
+    })
+    .finally(() => {
+      setIsSubmitting(false);
+    });
   };
 
   return (
@@ -17,56 +48,76 @@ export default function EmailVerificationPage({ route }) {
       <Text style={styles.subtitle}>
         Kode verifikasi telah dikirim ke email Anda: {email}
       </Text>
-      <View style={styles.codeContainer}>
-        <Text style={styles.verificationCode}>{verificationCode}</Text>
+      <View style={styles.codeInputContainer}>
+        <Text style={styles.inputLabel}>Masukkan Kode Verifikasi</Text>
+        <TextInput
+          style={styles.inputField}
+          placeholder="Kode Verifikasi"
+          keyboardType="numeric"
+          maxLength={6}
+          value={enteredCode}
+          onChangeText={(text) => setEnteredCode(text)}
+        />
       </View>
-      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-        <Text style={styles.continueButtonText}>Lanjutkan</Text>
+      <TouchableOpacity 
+        style={styles.verifyButton} 
+        onPress={handleVerify} 
+        disabled={isSubmitting}
+      >
+        <Text style={styles.verifyButtonText}>
+          {isSubmitting ? 'Memverifikasi...' : 'Verifikasi'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
     backgroundColor: '#f5f5f5',
+    padding: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 36,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    color: '#00ADB5',
+    marginBottom: 20,
   },
   subtitle: {
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  codeInputContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  inputLabel: {
     fontSize: 16,
-    color: '#555',
-    textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 5,
+    color: '#333',
   },
-  codeContainer: {
-    backgroundColor: '#e0f7fa',
-    padding: 20,
+  inputField: {
+    width: '100%',
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#00ADB5',
     borderRadius: 10,
-    marginBottom: 20,
+    fontSize: 16,
+    backgroundColor: '#fff',
   },
-  verificationCode: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007BFF',
-    textAlign: 'center',
-  },
-  continueButton: {
-    backgroundColor: '#007BFF',
+  verifyButton: {
+    width: '100%',
+    backgroundColor: '#00ADB5',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    width: '80%',
+    marginTop: 20,
   },
-  continueButtonText: {
+  verifyButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',

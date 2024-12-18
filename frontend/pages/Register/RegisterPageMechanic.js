@@ -7,13 +7,15 @@ import {
   TouchableOpacity,
   ImageBackground,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 export default function RegisterPageMechanic() {
   const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -21,20 +23,23 @@ export default function RegisterPageMechanic() {
   const [plateLetter1, setPlateLetter1] = useState('');
   const [plateNumber, setPlateNumber] = useState('');
   const [plateLetter2, setPlateLetter2] = useState('');
+  const [nik, setNik] = useState(''); // For storing NIK
   const navigation = useNavigation();
 
   const handleRegister = () => {
     const mechanicData = {
       full_name: fullName,
+      username: username,
       email_user: email,
       phone_user: phone,
       password_user: password,
       plate_number: `${plateLetter1} ${plateNumber} ${plateLetter2}`,
-      role_user: 'mechanic', // Role defaultnya sebagai mekanik
+      role_user: 'mechanic', // Default role as mechanic
+      nik: nik, // NIK value
     };
 
-    // Kirim data ke server menggunakan axios
-    axios.post('http://192.168.18.20:3000/register', mechanicData)
+    // Send data to the server using axios
+    axios.post('http://192.168.18.20:3000/mechanic/register', mechanicData)
       .then((response) => {
         alert('Mechanic registered successfully!');
         navigation.navigate('Login');
@@ -64,6 +69,12 @@ export default function RegisterPageMechanic() {
               placeholder="Nama Lengkap"
               value={fullName}
               onChangeText={(text) => setFullName(text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              value={username}
+              onChangeText={(text) => setUsername(text)}
             />
             <TextInput
               style={styles.input}
@@ -106,6 +117,14 @@ export default function RegisterPageMechanic() {
                 maxLength={3}
               />
             </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Nomor NIK"
+              value={nik}
+              onChangeText={(text) => setNik(text)}
+              keyboardType="numeric"
+              maxLength={16} // Adjust length based on NIK format
+            />
 
             <View style={styles.passwordContainer}>
               <TextInput
@@ -124,6 +143,8 @@ export default function RegisterPageMechanic() {
                 </Text>
               </TouchableOpacity>
             </View>
+
+            {/* Input NIK */}
 
             <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
               <Text style={styles.registerButtonText}>Daftar</Text>

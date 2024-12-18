@@ -13,20 +13,30 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "RoadBuddy membutuhkan akses lokasi Anda untuk memberikan navigasi dan menampilkan lokasi terkini Anda.",
+        "NSLocationAlwaysUsageDescription": "RoadBuddy membutuhkan akses lokasi Anda secara terus-menerus untuk menyediakan layanan lokasi meskipun aplikasi berjalan di latar belakang."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "permissions": [
       "CAMERA",
-      "MEDIA_LIBRARY"
+      "MEDIA_LIBRARY",
+      "LOCATION",
+      "INTERNET"
     ]
   }
 }
