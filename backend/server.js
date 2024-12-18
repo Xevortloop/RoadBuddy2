@@ -527,7 +527,7 @@ app.get('/transaksi/mechanic/:mechanicId', (req, res) => {
 
   // SQL query to fetch all transactions for the mechanic
   const query = `
-    SELECT t.id_transaksi, t.lokasi, t.status, t.created_at, u.username AS user_name, t.user_id, t.id_mechanic
+    SELECT t.id_transaksi, t.lokasi, t.latitude, t.longitude, t.status, t.created_at, u.username AS user_name, t.user_id, t.id_mechanic
     FROM transaksi t 
     JOIN user u ON t.user_id = u.id_user 
     WHERE t.status = 'in_progress'`;

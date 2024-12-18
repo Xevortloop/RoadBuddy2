@@ -3,11 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Impor AsyncStorage
 import MapView, { Marker } from 'react-native-maps'; // Impor MapView dan Marker
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { useNavigation } from '@react-navigation/native';
 
 const LocationPicker = () => {
-  const navigation = useNavigation();
   const [platNomor, setPlatNomor] = useState('');
   const [kendala, setKendala] = useState('');
   const [lokasi, setLokasi] = useState('');
@@ -100,9 +97,6 @@ const LocationPicker = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Form Kendala & Lokasi</Text>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home2')}>
-          <Icon name="arrow-left" size={24} color="#000" style={styles.icon} />
-        </TouchableOpacity>
 
       <TextInput
         style={styles.input}
@@ -203,9 +197,6 @@ const styles = StyleSheet.create({
     height: 250,
     borderRadius: 10,
     marginBottom: 20,
-  },
-  icon: {
-    color: '#000',
   },
 });
 
